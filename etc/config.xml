@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <qr_code>
+            <general>
+                <need_display>0</need_display>
+            </general>
+            <api>
+                <url>https://www.de-vis-software.ro/qrcodeme.aspx</url>
+            </api>
+            <cli>
+                <batch_size>100</batch_size>
+            </cli>
+        </qr_code>
+    </default>
+</config>

@@ -10,10 +10,8 @@ use Monogo\QrCode\Model\ApiClients\QrCode;
 use Monogo\QrCode\Setup\Patch\Data\AddQrCodeDataProductAttribute;
 use Psr\Log\LoggerInterface;
 
-class UpdateConsumer
+class SetQrCodeAttrConsumer
 {
-    private const RESPONSE_FIELD = 'base64QRCode';
-
     /**
      * @var LoggerInterface
      */
@@ -62,9 +60,7 @@ class UpdateConsumer
         try {
             $productDataList = $this->serializer->unserialize($productData);
             foreach ($productDataList as $productId => $qrCodeData) {
-                $responseData = $this->qrCodeApiClient->call($qrCodeData);
-                $response = $this->serializer->unserialize($responseData);
-                $qrCode = $response[self::RESPONSE_FIELD] ?? '';
+                $qrCode = $this->qrCodeApiClient->getQrCodeData($qrCodeData);
                 if ($qrCode) {
                     $this->productAction->updateAttributes([$productId], [AddQrCodeDataProductAttribute::ATTR_CODE => $qrCode], 0);
                 }

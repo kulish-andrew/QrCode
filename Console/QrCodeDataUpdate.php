@@ -111,8 +111,7 @@ class QrCodeDataUpdate extends Command
 
             $skuList = $input->getOption(self::COMMAND_SKU_OPTION_NAME);
             if ($skuList) {
-                $skuList = str_replace(' ', '', $skuList);
-                $skuList = explode(',', $skuList);
+                $skuList = $this->convertSkusToArray($skuList);
             }
 
             $this->updateProducts($output, $batchSize, $skuList);
@@ -151,5 +150,15 @@ class QrCodeDataUpdate extends Command
             $this->productDataPublisher->execute($productDataJson);
             $collection->clear();
         }
+    }
+
+    /**
+     * @param string $skus
+     * @return array
+     */
+    private function convertSkusToArray(string $skus): array
+    {
+        $skuList = explode(',', $skus);
+        return array_map('trim', $skuList);
     }
 }

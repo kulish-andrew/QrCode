@@ -2,5 +2,5 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/consumer.xsd">
     <consumer name="qrcode.processing.consumer" queue="qrcode.processing.queue" connection="amqp"
-              handler="Monogo\QrCode\Model\RabbitMQ\Products\UpdateConsumer::processMessage"/>
+              handler="Monogo\QrCode\Model\RabbitMQ\Products\SetQrCodeAttrConsumer::processMessage"/>
 </config>

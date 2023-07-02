@@ -3,7 +3,7 @@
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceBlock name="product.info.details">
-            <block class="Magento\Catalog\Block\Product\View" name="custom.tab"
+            <block class="Monogo\QrCode\Block\QrCode\View" name="qrcode.tab"
                    template="Monogo_QrCode::product/view/details/qrcode_tab.phtml" group="detailed_info"
                    ifconfig="qr_code/general/need_display">
                 <arguments>

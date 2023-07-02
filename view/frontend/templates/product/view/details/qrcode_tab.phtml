@@ -1,13 +1,14 @@
 <?php
 /**
- * @var $block \Magento\Catalog\Block\Product\View
+ * @var $block \Monogo\QrCode\Block\QrCode\View
  */
 
 $product = $block->getProduct();
 $qrCode = $product->getQrcodeData();
 $productName = $product->getName();
 ?>
-<?php if ($qrCode): ?>
+
+<?php if ($qrCode && $block->isBase64Image($qrCode)): ?>
     <div class="qr-code-wrap">
         <img class="qr-code" src="data:image/png;base64,<?= $qrCode ?>" alt="<?= $productName ?>"
              title="<?= $productName ?>"/>

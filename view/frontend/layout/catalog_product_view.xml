@@ -9,6 +9,7 @@
                 <arguments>
                     <argument translate="true" name="title" xsi:type="string">QR Code</argument>
                     <argument name="sort_order" xsi:type="string">200</argument>
+                    <argument name="view_model" xsi:type="object">Monogo\QrCode\ViewModel\QrCode</argument>
                 </arguments>
             </block>
         </referenceBlock>

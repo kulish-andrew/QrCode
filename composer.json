@@ -7,8 +7,7 @@
         "magento/framework": "*",
         "magento/module-catalog": "*",
         "magento/module-amqp": "*",
-        "ext-curl": "*",
-        "ext-fileinfo": "*"
+        "ext-curl": "*"
     },
     "license": [
         "Proprietary"

@@ -40,22 +40,4 @@ class View extends Template
 
         return $this->product;
     }
-
-    /**
-     * @param string $base64Image
-     * @return bool
-     */
-    public function isBase64Image(string $base64Image): bool
-    {
-        $decodedImage = base64_decode($base64Image, true);
-        if (!$decodedImage) {
-            return false;
-        }
-
-        $fileInfo = finfo_open();
-        $mimeType = finfo_buffer($fileInfo, $decodedImage, FILEINFO_MIME_TYPE);
-        finfo_close($fileInfo);
-
-        return str_starts_with($mimeType, 'image/');
-    }
 }

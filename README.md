@@ -35,3 +35,19 @@ Contributions are welcome! If you encounter any issues or have suggestions for i
 ## License
 
 Monogo_QrCode is released under the [MIT License](LICENSE.txt).
+
+
+### Test Task Requirements for module
+Preparation of product attribute update module which also formats the attribute value to a
+QR code
+1. create a new product EAV attribute using magento installer
+2. using the CLI command and magento queues, copy the names of all products to the
+   newly created product attribute
+3. CLI command should be constructed in such a way, that you can pass a number of
+   synchronized products as an argument, otherwise - read it from configuration.
+4. the new attribute should be supported in Magento Web API both when reading and
+   writing the product using a view model feature
+5. the QR code with the saved value of the attribute should be displayed on the product
+   page
+6. to generate the QR code, use the API
+   https://www.de-vis-software.ro/qr-code-generator-api.aspx service

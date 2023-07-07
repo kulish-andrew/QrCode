@@ -1,0 +1,18 @@
+<?php
+/**
+ * @var $block \Monogo\QrCode\Block\QrCode\View
+ * @var $viewModel \Monogo\QrCode\ViewModel\QrCode
+ */
+
+$product = $block->getProduct();
+$qrCode = $product->getQrcodeData();
+$productName = $product->getName();
+$viewModel = $block->getViewModel();
+?>
+
+<?php if ($qrCode && $viewModel->isBase64Image($qrCode)): ?>
+    <div class="qr-code-wrap">
+        <img class="qr-code" src="data:image/png;base64,<?= $qrCode ?>" alt="<?= $productName ?>"
+             title="<?= $productName ?>"/>
+    </div>
+<?php endif; ?>

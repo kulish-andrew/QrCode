@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="product.info.details">
+            <block class="Monogo\QrCode\Block\QrCode\View" name="qrcode.tab"
+                   template="Monogo_QrCode::product/view/details/qrcode_tab.phtml" group="detailed_info"
+                   ifconfig="qr_code/general/need_display">
+                <arguments>
+                    <argument translate="true" name="title" xsi:type="string">QR Code</argument>
+                    <argument name="sort_order" xsi:type="string">200</argument>
+                    <argument name="view_model" xsi:type="object">Monogo\QrCode\ViewModel\QrCode</argument>
+                </arguments>
+            </block>
+        </referenceBlock>
+    </body>
+</page>

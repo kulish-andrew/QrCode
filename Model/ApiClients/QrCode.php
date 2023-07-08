@@ -3,16 +3,19 @@ declare(strict_types=1);
 
 namespace Monogo\QrCode\Model\ApiClients;
 
+use GuzzleHttp\ClientFactory;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Psr7\ResponseFactory;
+use GuzzleHttp\RequestOptions;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\ValidatorException;
 use Magento\Framework\Serialize\SerializerInterface;
+use Monogo\QrCode\Api\Clients\QrCodeInterface;
 use Monogo\QrCode\Model\Config;
-use RuntimeException;
 
-class QrCode
+class QrCode implements QrCodeInterface
 {
-    private const QR_CODE_FIELD = 'base64QRCode';
-
     /**
      * @var Config
      */
@@ -24,17 +27,33 @@ class QrCode
     private SerializerInterface $serializer;
 
     /**
+     * @var ClientFactory
+     */
+    private ClientFactory $clientFactory;
+
+    /**
+     * @var ResponseFactory
+     */
+    private ResponseFactory $responseFactory;
+
+    /**
      * QrCode constructor
      *
      * @param Config $config
      * @param SerializerInterface $serializer
+     * @param ClientFactory $clientFactory
+     * @param ResponseFactory $responseFactory
      */
     public function __construct(
         Config              $config,
-        SerializerInterface $serializer
+        SerializerInterface $serializer,
+        ClientFactory       $clientFactory,
+        ResponseFactory     $responseFactory
     ) {
         $this->config = $config;
         $this->serializer = $serializer;
+        $this->clientFactory = $clientFactory;
+        $this->responseFactory = $responseFactory;
     }
 
     /**
@@ -45,54 +64,93 @@ class QrCode
      */
     public function getQrCodeData(string $data): ?string
     {
-        $ch = curl_init();
-        if (false === $ch) {
-            throw new RuntimeException('Failed to initialize cURL.');
+        $response = $this->doRequest($data);
+        $content = $response->getBody()->getContents();
+        if (!$content) {
+            throw new LocalizedException(__('[Monogo_QrCode]: No content for requested data: %1', $data));
         }
 
-        $requestData = $this->serializer->serialize(['plainText' => $data]);
-        $this->setCurlOptions($ch, $requestData);
-        $content = curl_exec($ch);
-
-        if (false === $content) {
-            $errorCode = curl_errno($ch);
-            $errorMessage = curl_error($ch);
-            throw new LocalizedException(__('cURL failed with error #%1: %2', $errorCode, $errorMessage));
+        $unSerializedContent = $this->serializer->unserialize($content);
+        $qrCode = $unSerializedContent[self::QR_CODE_FIELD] ?? null;
+        if (!$qrCode) {
+            throw new LocalizedException(__('[Monogo_QrCode]: No QR Code data. Response: %1', $content));
         }
-        curl_close($ch);
 
-        $content = $this->serializer->unserialize($content);
-        return $content[self::QR_CODE_FIELD] ?? null;
+        return $qrCode;
     }
 
     /**
-     * @param $ch
-     * @param string $requestData
-     * @return void
+     * @param string $data
+     * @param array $parameters
+     * @return Response
      * @throws ValidatorException
      */
-    private function setCurlOptions($ch, string $requestData): void
+    private function doRequest(string $data, array $parameters = []): Response
     {
-        $url = $this->config->getApiUrl();
-        $username = $this->config->getApiUsername();
-        $password = $this->config->getApiPassword();
+        $parameters = $this->prepareParams($data, $parameters);
+        $client = $this->clientFactory->create();
 
-        if (!$url || !$username || !$password) {
-            throw new ValidatorException(__('Please verify credentials and try again.'));
+        try {
+            $response = $client->request(
+                self::REQUEST_METHOD,
+                $this->getEndpointUrl(),
+                $parameters
+            );
+        } catch (GuzzleException $exception) {
+            $response = $this->responseFactory->create([
+                'status' => $exception->getCode(),
+                'reason' => $exception->getMessage()
+            ]);
         }
 
-        $hash = base64_encode($username . ':' . $password);
-        $headers = ['Authorization: Basic ' . $hash];
+        return $response;
+    }
 
-        curl_setopt_array($ch, [
-            CURLOPT_URL => $url,
-            CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => $requestData,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_HEADER => false,
-            CURLOPT_HTTPHEADER => $headers,
-        ]);
+    /**
+     * @param string $data
+     * @param array $parameters
+     * @return array
+     * @throws ValidatorException
+     */
+    private function prepareParams(string $data, array $parameters): array
+    {
+        $parameters[RequestOptions::HEADERS] = [
+            'Content-Type' => self::CONTENT_TYPE,
+            'cache-control' => self::CACHE_CONTROL
+        ];
+        $parameters[RequestOptions::HEADERS]['Authorization'] = $this->getAuthData();
+        $parameters['json'] = $this->serializer->serialize(['plainText' => $data]);
+
+        return $parameters;
+    }
+
+    /**
+     * @return string
+     * @throws ValidatorException
+     */
+    private function getAuthData(): string
+    {
+        $username = $this->config->getApiUsername();
+        $password = $this->config->getApiPassword();
+        if (!$username || !$password) {
+            throw new ValidatorException(__('[Monogo_QrCode]: Please verify credentials and try again.'));
+        }
+        $hash = base64_encode($username . ':' . $password);
+
+        return "Basic {$hash}";
+    }
+
+    /**
+     * @return string
+     * @throws ValidatorException
+     */
+    private function getEndpointUrl(): string
+    {
+        $uriEndpoint = $this->config->getApiUrl();
+        if (!$uriEndpoint) {
+            throw new ValidatorException(__('[Monogo_QrCode]: Please verify the endpoint URL.'));
+        }
+
+        return $uriEndpoint;
     }
 }

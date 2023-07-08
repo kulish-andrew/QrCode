@@ -7,8 +7,8 @@ use Exception;
 use Magento\Catalog\Model\ResourceModel\Product\Action;
 use Magento\Framework\Serialize\SerializerInterface;
 use Monogo\QrCode\Api\Clients\QrCodeInterface;
-use Monogo\QrCode\Model\ApiClients\QrCode;
 use Monogo\QrCode\Api\Data\QrCodeAttributeInterface;
+use Monogo\QrCode\Model\ApiClients\QrCode;
 use Psr\Log\LoggerInterface;
 
 class SetQrCodeAttrConsumer
@@ -63,7 +63,11 @@ class SetQrCodeAttrConsumer
             foreach ($productDataList as $productId => $qrCodeData) {
                 $qrCode = $this->qrCodeApiClient->getQrCodeData($qrCodeData);
                 if ($qrCode) {
-                    $this->productAction->updateAttributes([$productId], [QrCodeAttributeInterface::ATTR_CODE => $qrCode], 0);
+                    $this->productAction->updateAttributes(
+                        [$productId],
+                        [QrCodeAttributeInterface::ATTR_CODE => $qrCode],
+                        0
+                    );
                 }
             }
         } catch (Exception $e) {

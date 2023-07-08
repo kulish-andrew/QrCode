@@ -6,8 +6,9 @@ namespace Monogo\QrCode\Model\RabbitMQ\Products;
 use Exception;
 use Magento\Catalog\Model\ResourceModel\Product\Action;
 use Magento\Framework\Serialize\SerializerInterface;
+use Monogo\QrCode\Api\Clients\QrCodeInterface;
 use Monogo\QrCode\Model\ApiClients\QrCode;
-use Monogo\QrCode\Setup\Patch\Data\AddQrCodeDataProductAttribute;
+use Monogo\QrCode\Api\Data\QrCodeAttributeInterface;
 use Psr\Log\LoggerInterface;
 
 class SetQrCodeAttrConsumer
@@ -28,9 +29,9 @@ class SetQrCodeAttrConsumer
     private Action $productAction;
 
     /**
-     * @var QrCode
+     * @var QrCodeInterface
      */
-    private QrCode $qrCodeApiClient;
+    private QrCodeInterface $qrCodeApiClient;
 
     /**
      * UpdateConsumer constructor
@@ -44,7 +45,7 @@ class SetQrCodeAttrConsumer
         LoggerInterface     $logger,
         SerializerInterface $serializer,
         Action              $productAction,
-        QrCode              $qrCodeApiClient
+        QrCodeInterface     $qrCodeApiClient
     ) {
         $this->logger = $logger;
         $this->serializer = $serializer;
@@ -62,7 +63,7 @@ class SetQrCodeAttrConsumer
             foreach ($productDataList as $productId => $qrCodeData) {
                 $qrCode = $this->qrCodeApiClient->getQrCodeData($qrCodeData);
                 if ($qrCode) {
-                    $this->productAction->updateAttributes([$productId], [AddQrCodeDataProductAttribute::ATTR_CODE => $qrCode], 0);
+                    $this->productAction->updateAttributes([$productId], [QrCodeAttributeInterface::ATTR_CODE => $qrCode], 0);
                 }
             }
         } catch (Exception $e) {

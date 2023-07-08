@@ -7,12 +7,10 @@ use Magento\Eav\Model\Entity\Attribute\ScopedAttributeInterface;
 use Magento\Eav\Setup\EavSetupFactory;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
+use Monogo\QrCode\Api\Data\QrCodeAttributeInterface;
 
-class AddQrCodeDataProductAttribute implements DataPatchInterface
+class AddQrCodeDataProductAttribute implements DataPatchInterface, QrCodeAttributeInterface
 {
-    public const ATTR_CODE = 'qrcode_data';
-    public const ATTR_NAME = 'QR Code Data';
-
     /**
      * @var ModuleDataSetupInterface
      */
@@ -45,10 +43,10 @@ class AddQrCodeDataProductAttribute implements DataPatchInterface
 
         $eavSetup->addAttribute(
             Product::ENTITY,
-            self::ATTR_CODE,
+            QrCodeAttributeInterface::ATTR_CODE,
             [
                 'type' => 'text',
-                'label' => self::ATTR_NAME,
+                'label' => QrCodeAttributeInterface::ATTR_NAME,
                 'input' => 'text',
                 'required' => false,
                 'sort_order' => 100,

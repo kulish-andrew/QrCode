@@ -7,4 +7,5 @@
             </argument>
         </arguments>
     </type>
+    <preference for="Monogo\QrCode\Api\Clients\QrCodeInterface" type="Monogo\QrCode\Model\ApiClients\QrCode"/>
 </config>
